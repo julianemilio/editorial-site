@@ -3,7 +3,7 @@ import PriceTag from "@/components/PriceTag";
 export default function BookCard({
   libro
 }: {
-  libro: { titulo: string; autor: string; precio: number };
+  libro: { id: number; titulo: string; autor: string; precio: number };
 }) {
   return (
     <article className="border border-gray-700 p-4 rounded-2xl shadow hover:shadow-lg transition-all">
