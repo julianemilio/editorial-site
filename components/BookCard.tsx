@@ -20,7 +20,7 @@ export default function BookCard({ libro }: { libro: Book }) {
       titulo: libro.titulo,
       precio: libro.precioOferta ?? libro.precio,
       cantidad: 1,
-      imagen: libro.imagen
+      portada: libro.imagen
     });
     console.log(`🛒 "${libro.titulo}" agregado al carrito`);
   };
