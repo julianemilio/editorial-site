@@ -1,18 +1,26 @@
 @import "tailwindcss";
 
+/* 🎨 Paleta y tipografía */
 @theme {
   --font-sans: "Inter", system-ui, sans-serif;
   --color-brand-black: #0B0B0C;
   --color-brand-blue: #C7E2FF;
 }
 
-body {
+/* Estilos globales */
+html, body {
   font-family: var(--font-sans);
-  background-color: var(--color-brand-black);
-  color: white;
+  background-color: white;
+  color: #171717;
   margin: 0;
+  padding: 0;
 }
 
 a {
+  color: var(--color-brand-black);
+  text-decoration: none;
+}
+
+a:hover {
   color: var(--color-brand-blue);
 }

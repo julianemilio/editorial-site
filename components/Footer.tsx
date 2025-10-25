@@ -2,41 +2,46 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="w-full border-t border-gray-800 bg-brand-black text-gray-400">
-      <div className="mx-auto max-w-6xl px-4 py-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        {/* Logo & texto */}
+    <footer className="bg-[#E9F1FA] text-[#171717] text-sm mt-12 border-t border-gray-200">
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center p-6 gap-6">
+        {/* Logo */}
         <div className="flex items-center gap-3">
-          <img
-            src="/logo.svg"
-            alt="Logo Editorial"
-            className="h-8 w-8 object-contain opacity-90"
-          />
-          <p className="text-sm">
-            © {new Date().getFullYear()} Editorial Coneja. Todos los derechos
-            reservados.
-          </p>
+          <img src="/logo.svg" alt="Logo Coneja" className="h-10 w-10" />
+          <div>
+            <p className="font-semibold">CONEJA</p>
+            <p className="text-xs tracking-wide">LIBROS ILUSTRADOS</p>
+          </div>
         </div>
 
-        {/* Links secundarios */}
-        <div className="flex gap-4 text-sm">
-          <Link
-            href="/politica-de-privacidad"
-            className="hover:text-brand-blue transition-colors"
-          >
-            Política de Privacidad
-          </Link>
-          <Link
-            href="/terminos"
-            className="hover:text-brand-blue transition-colors"
-          >
-            Términos
-          </Link>
-          <a
-            href="mailto:contacto@conejaeditorial.com"
-            className="hover:text-brand-blue transition-colors"
-          >
-            contacto@conejaeditorial.com
-          </a>
+        {/* Info de contacto */}
+        <div className="text-sm text-right md:text-left leading-relaxed">
+          <p>
+            <strong>© 2025 Coneja Libros Ilustrados.</strong> Todos los derechos
+            reservados.
+          </p>
+          <p>
+            <strong>Email:</strong>{" "}
+            <a
+              href="mailto:conejalibrosilustrados@gmail.com"
+              className="hover:underline"
+            >
+              conejalibrosilustrados@gmail.com
+            </a>
+          </p>
+          <p>
+            <strong>Instagram:</strong>{" "}
+            <a
+              href="https://instagram.com/conejalibros"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              @coneja.libros
+            </a>
+          </p>
+          <p>
+            <strong>WhatsApp:</strong> <a href="https://wa.me/3160926424">316 092 6424</a>
+          </p>
         </div>
       </div>
     </footer>

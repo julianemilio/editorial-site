@@ -1,21 +1,24 @@
-import "../app/globals.css";
+import "@/app/globals.css";
 import type { Metadata } from "next";
 import { ReactNode } from "react";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer"
+import Footer from "@/components/Footer";
+import { CartProvider } from "@/context/CartContext";
 
 export const metadata: Metadata = {
-  title: "Editorial Coneja",
-  description: "Catálogo y servicios editoriales"
+  title: "Coneja Libros Ilustrados",
+  description: "Editorial independiente — libros ilustrados y relatos oníricos."
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es">
-      <body className="flex flex-col min-h-screen bg-brand-black text-white">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+      <body className="flex flex-col min-h-screen bg-white text-[#171717]">
+        <CartProvider>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );

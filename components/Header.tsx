@@ -7,70 +7,46 @@ export default function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="w-full border-b border-gray-800 bg-brand-black text-white">
-      <div className="mx-auto flex max-w-6xl items-center justify-between p-4">
-        {/* Logo / Brand */}
+    <header className="w-full border-b border-gray-200 bg-white text-[#171717]">
+      <div className="mx-auto max-w-6xl flex items-center justify-between p-4">
+        {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <img
-            src="/logo.svg"
-            alt="Logo Editorial"
-            className="h-8 w-8 object-contain"
-          />
-          <span className="text-lg font-semibold text-brand-blue">
-            Editorial Coneja
-          </span>
+          <img src="/coneja-logo.jpg" alt="Coneja logo" className="h-30 w-30" />
         </Link>
 
-        {/* Desktop navigation */}
-        <nav className="hidden gap-6 md:flex">
-          <Link href="/libros" className="hover:text-brand-blue transition-colors">
-            Libros
-          </Link>
-          <Link href="/nosotros" className="hover:text-brand-blue transition-colors">
-            Nosotros
-          </Link>
-          <Link href="/librerias" className="hover:text-brand-blue transition-colors">
-            Librerías aliadas
-          </Link>
-          <Link href="/servicios" className="hover:text-brand-blue transition-colors">
-            Servicios
-          </Link>
-          <Link href="/contacto" className="hover:text-brand-blue transition-colors">
-            Contacto
-          </Link>
+        {/* Navegación Desktop */}
+        <nav className="hidden md:flex gap-10 font-medium text-2xl">
+          <Link href="/libros">LIBROS</Link>
+          <Link href="/nosotras">NOSOTRAS</Link>
+          <Link href="/librerias">LIBRERÍAS</Link>
+          <Link href="/servicios">SERVICIOS</Link>
+          <Link href="/contacto">CONTACTO</Link>
         </nav>
 
-        {/* Mobile menu button */}
+        {/* Ícono carrito (placeholder) */}
+        <div className="hidden md:flex items-center gap-2 cursor-pointer hover:opacity-80">
+          <span className="text-xl">🛒</span>
+        </div>
+
+        {/* Botón mobile */}
         <button
+          className="md:hidden text-2xl"
           onClick={() => setOpen(!open)}
-          className="md:hidden text-brand-blue hover:opacity-80"
           aria-label="Abrir menú"
         >
           ☰
         </button>
       </div>
 
-      {/* Mobile dropdown */}
+      {/* Navegación mobile */}
       {open && (
-        <div className="md:hidden border-t border-gray-800 bg-brand-black px-4 pb-4">
-          <nav className="flex flex-col gap-2 mt-2 text-sm">
-            <Link href="/libros" onClick={() => setOpen(false)}>
-              Libros
-            </Link>
-            <Link href="/nosotros" onClick={() => setOpen(false)}>
-              Nosotros
-            </Link>
-            <Link href="/librerias" onClick={() => setOpen(false)}>
-              Librerías aliadas
-            </Link>
-            <Link href="/servicios" onClick={() => setOpen(false)}>
-              Servicios
-            </Link>
-            <Link href="/contacto" onClick={() => setOpen(false)}>
-              Contacto
-            </Link>
-          </nav>
-        </div>
+        <nav className="flex flex-col items-center gap-4 py-4 border-t border-gray-200 bg-white md:hidden">
+          <Link href="/libros" onClick={() => setOpen(false)}>Libros</Link>
+          <Link href="/nosotras" onClick={() => setOpen(false)}>Nosotras</Link>
+          <Link href="/librerias" onClick={() => setOpen(false)}>Librerías</Link>
+          <Link href="/servicios" onClick={() => setOpen(false)}>Servicios</Link>
+          <Link href="/contacto" onClick={() => setOpen(false)}>Contacto</Link>
+        </nav>
       )}
     </header>
   );

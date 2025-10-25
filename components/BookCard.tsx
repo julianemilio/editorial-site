@@ -1,23 +1,73 @@
-import PriceTag from "@/components/PriceTag";
+"use client";
+import { useCart } from "@/context/CartContext";
 
-export default function BookCard({
-  libro
-}: {
-  libro: { id: number; titulo: string; autor: string; precio: number };
-}) {
+export interface Book {
+  id: number;
+  titulo: string;
+  autor: string;
+  descripcion: string;
+  precio: number;
+  precioOferta?: number;
+  imagen: string;
+}
+
+export default function BookCard({ libro }: { libro: Book }) {
+  const { addToCart } = useCart();
+
+  const handleAdd = () => {
+    addToCart({
+      id: libro.id,
+      titulo: libro.titulo,
+      precio: libro.precioOferta ?? libro.precio,
+      cantidad: 1,
+      imagen: libro.imagen
+    });
+    console.log(`🛒 "${libro.titulo}" agregado al carrito`);
+  };
+
   return (
-    <article className="border border-gray-700 p-4 rounded-2xl shadow hover:shadow-lg transition-all">
-      <img
-        src={`/portadas/${libro.id}.jpg`}
-        alt={libro.titulo}
-        className="rounded-xl mb-4"
-      />
-      <h2 className="text-lg font-semibold">{libro.titulo}</h2>
-      <p className="text-sm text-gray-400 mb-2">{libro.autor}</p>
-      <PriceTag price={libro.precio} />
-      <button className="mt-3 bg-brand-blue text-brand-black px-4 py-2 rounded-xl hover:opacity-90">
-        Agregar al carrito
-      </button>
+    <article className="border border-gray-200 rounded-lg p-6 flex flex-col md:flex-row gap-6 bg-white">
+      <div className="flex justify-center md:w-1/3">
+        <img
+          src={libro.imagen}
+          alt={libro.titulo}
+          className="rounded shadow-md max-w-xs"
+        />
+      </div>
+
+      <div className="flex flex-col md:w-2/3 justify-center text-left">
+        <h2 className="text-3xl font-bold mb-2">{libro.titulo}</h2>
+        <p className="font-medium mb-4 text-lg">{libro.autor}</p>
+        <p className="text-gray-600 italic mb-6 leading-relaxed">
+          {libro.descripcion}
+        </p>
+
+        <p className="font-semibold mb-1">Precio de lanzamiento:</p>
+        <p className="text-lg mb-4">
+          {libro.precioOferta ? (
+            <>
+              <span className="line-through text-gray-400 mr-2">
+                ${libro.precio.toLocaleString()}
+              </span>
+              <span className="font-bold">
+                ${libro.precioOferta.toLocaleString()} COP
+              </span>
+            </>
+          ) : (
+            <span className="font-bold">
+              ${libro.precio.toLocaleString()} COP
+            </span>
+          )}
+        </p>
+
+        {/* 🛒 Botón de carrito */}
+        <button
+          onClick={handleAdd}
+          className="bg-[#171717] text-white px-5 py-2 rounded-full font-medium hover:bg-[#0B0B0C] transition"
+        >
+          Agregar al carrito
+        </button>
+      </div>
     </article>
   );
 }
