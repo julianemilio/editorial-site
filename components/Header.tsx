@@ -15,11 +15,11 @@ export default function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <Image
-            src="/coneja-logo.jpg"
+            src="/coneja-logo"
             alt="Coneja logo"
             width={60}
             height={60}
-            className="w-14 h-14 object-contain md:w-16 md:h-16"
+            className="w-20 h-20 object-contain md:w-20 md:h-20"
             priority
           />
         </Link>
