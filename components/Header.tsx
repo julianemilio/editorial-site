@@ -14,14 +14,12 @@ export default function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <Image
+          <img
             src="/coneja-logo.jpg"
             alt="Coneja logo"
-            width={60}
-            height={60}
             className="w-20 h-20 object-contain md:w-30 md:h-30"
-            priority
           />
+          
         </Link>
 
         {/* Navegación desktop */}
