@@ -6,11 +6,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center p-6 gap-6">
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <img src="/logo.svg" alt="Logo Coneja" className="h-10 w-10" />
-          <div>
-            <p className="font-semibold">CONEJA</p>
-            <p className="text-xs tracking-wide">LIBROS ILUSTRADOS</p>
-          </div>
+          <img src="/concha-logo-name.png" alt="Logo Coneja" className="h-35" />
         </div>
 
         {/* Info de contacto */}
