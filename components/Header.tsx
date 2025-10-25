@@ -19,7 +19,7 @@ export default function Header() {
             alt="Coneja logo"
             width={60}
             height={60}
-            className="w-20 h-20 object-contain md:w-20 md:h-20"
+            className="w-20 h-20 object-contain md:w-30 md:h-30"
             priority
           />
         </Link>
