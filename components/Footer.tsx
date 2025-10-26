@@ -18,10 +18,10 @@ export default function Footer() {
           <p>
             <strong>Email:</strong>{" "}
             <a
-              href="mailto:conejalibrosilustrados@gmail.com"
+              href="mailto:contacto@conejalibrosilustrados.com"
               className="hover:underline"
             >
-              conejalibrosilustrados@gmail.com
+              contacto@conejalibrosilustrados.com
             </a>
           </p>
           <p>

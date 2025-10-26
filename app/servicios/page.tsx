@@ -2,6 +2,8 @@ export default function ServiciosPage() {
   return (
     <main className="bg-white text-[#171717] min-h-screen">
       <section className="mx-auto max-w-6xl px-4 py-16">
+       
+       <h1 className="text-5xl font-extrabold mb-10">SERVICIOS</h1>
 
         {/* Introducción */}
         <p className="text-lg text-[#444] mb-12">
@@ -52,10 +54,10 @@ export default function ServiciosPage() {
 
           <div className="flex flex-wrap items-center gap-4">
             <a
-              href="mailto:conejalibrosilustrados@gmail.com"
+              href="mailto:contacto@conejalibrosilustrados.com"
               className="inline-flex items-center rounded-full border border-[#171717] px-6 py-2 text-base font-semibold text-[#171717] hover:bg-[#171717] hover:text-white transition"
             >
-              conejalibrosilustrados@gmail.com
+              contacto@conejalibrosilustrados.com
             </a>
             <a
               href="https://wa.me/573160926424"
