@@ -32,7 +32,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="hover:underline"
             >
-              @coneja.libros
+              @conejalibros
             </a>
           </p>
           <p>
