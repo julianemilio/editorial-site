@@ -1,9 +1,13 @@
-export default function PagoRespuesta({ searchParams }) {
-  const estado = searchParams.x_response;
-  const referencia = searchParams.x_ref_payco;
+export default function PagoRespuesta({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const estado = searchParams["x_response"];
+  const referencia = searchParams["x_ref_payco"];
 
   return (
-    <div className="min-h-screen flex flex-col items-center  text-center p-8">
+    <div className="min-h-screen flex flex-col items-center justify-center text-center p-8">
       {estado === "Aceptada" ? (
         <>
           <h1 className="text-4xl font-bold text-green-600">
