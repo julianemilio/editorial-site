@@ -3,10 +3,7 @@ export default function LibreriasPage() {
     <main className="bg-white text-[#171717] min-h-screen">
       <section className="mx-auto max-w-6xl px-4 py-16">
         {/* Título principal */}
-        <h1 className="text-5xl font-extrabold mb-10">LIBRERÍAS</h1>
-
-        {/* Subtítulo */}
-        <h2 className="text-2xl font-semibold mb-6">Librerías amigas</h2>
+        <h1 className="text-5xl font-extrabold mb-10">LIBRERÍAS AMIGAS</h1>
 
         {/* Introducción */}
         <p className="text-lg text-[#444] leading-relaxed mb-12 max-w-3xl">

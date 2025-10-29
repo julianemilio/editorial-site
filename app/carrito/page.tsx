@@ -1,5 +1,6 @@
 "use client";
 
+import EpaycoCheckoutButton from "@/components/EpaycoCheckoutButton";
 import { useCart } from "@/context/CartContext";
 
 export default function CarritoPage() {
@@ -9,6 +10,9 @@ export default function CarritoPage() {
     (sum, l) => sum + l.precio * (l.cantidad ?? 1),
     0
   );
+
+   // eslint-disable-next-line react-hooks/purity
+   const randomInvoiceId = `CONEJA-INV-${Math.floor(Math.random() * 100000)}`;
 
   return (
     <section className="max-w-5xl mx-auto p-8">
@@ -88,15 +92,21 @@ export default function CarritoPage() {
 
           {/* Total */}
           <div className="text-right mt-6">
-            <p className="text-lg font-bold text-white">
+            <p className="text-lg font-bold text-blue-400">
               Total:{" "}
               <span className="text-brand-blue">
                 ${total.toLocaleString()} COP
               </span>
             </p>
-            <button className="mt-4 bg-brand-black text-brand-blue px-6 py-2 rounded-xl hover:opacity-90 font-semibold">
-              Finalizar compra
-            </button>
+             <EpaycoCheckoutButton
+               title="Coneja Editorial"
+               description="Compra de libros en Coneja Editorial"
+               amount={total}
+               invoiceId={`CONEJA-INV-004${randomInvoiceId.toString()}`}
+               buyerName="Cliente Demo"
+               buyerEmail="julianosoriolarroche@gmail.com"
+               buyerPhone="3001234567"
+             />
           </div>
         </div>
       )}
