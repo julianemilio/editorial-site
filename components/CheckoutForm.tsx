@@ -3,123 +3,79 @@ import { ChangeEvent, FormEvent } from "react";
 
 interface CheckoutFormProps {
   formData: BillingFormData;
+  formErrors: Record<string, string>;
   handleChange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void;
   handleSubmit: (e: FormEvent<HTMLFormElement>) => void;
 }
 
-// 🌎 Datos anidados de departamentos y ciudades de Colombia
+// 🌎 Departamentos y ciudades anidadas
 const colombiaData: Record<string, string[]> = {
-  "Amazonas": ["Leticia", "Puerto Nariño", "La Pedrera", "El Encanto"],
-  "Antioquia": [
-    "Medellín", "Bello", "Envigado", "Itagüí", "Rionegro", "Turbo",
-    "Apartadó", "La Ceja", "Sabaneta", "Copacabana", "Caucasia", "Amagá",
-    "Santa Fe de Antioquia", "Marinilla", "El Carmen de Viboral"
-  ],
-  "Arauca": ["Arauca", "Arauquita", "Saravena", "Tame", "Cravo Norte", "Puerto Rondón", "Fortul"],
-  "Atlántico": ["Barranquilla", "Soledad", "Malambo", "Sabanalarga", "Puerto Colombia", "Galapa", "Baranoa", "Santo Tomás"],
-  "Bolívar": [
-    "Cartagena", "Magangué", "Turbaco", "El Carmen de Bolívar", "Mompox",
-    "Arjona", "San Juan Nepomuceno", "María La Baja", "San Jacinto"
-  ],
-  "Boyacá": [
-    "Tunja", "Duitama", "Sogamoso", "Chiquinquirá", "Paipa", "Samacá",
-    "Moniquirá", "Nobsa", "Villa de Leyva"
-  ],
-  "Caldas": ["Manizales", "La Dorada", "Villamaría", "Chinchiná", "Anserma", "Riosucio", "Supía"],
-  "Caquetá": ["Florencia", "Curillo", "La Montañita", "Morelia", "Belén de los Andaquíes", "El Doncello", "Puerto Rico"],
-  "Casanare": ["Yopal", "Aguazul", "Villanueva", "Tauramena", "Paz de Ariporo", "Monterrey"],
-  "Cauca": [
-    "Popayán", "Santander de Quilichao", "Puerto Tejada", "Patía", "El Tambo",
-    "Guapi", "Suárez", "Cajibío"
-  ],
-  "Cesar": ["Valledupar", "Aguachica", "La Jagua de Ibirico", "Curumaní", "El Copey", "Bosconia", "Chiriguaná"],
-  "Chocó": ["Quibdó", "Istmina", "Tadó", "Condoto", "Acandí", "Bahía Solano", "Nuquí"],
-  "Córdoba": ["Montería", "Lorica", "Planeta Rica", "Cereté", "Sahagún", "Tierralta", "Montelíbano"],
-  "Cundinamarca": [
-    "Bogotá", "Soacha", "Zipaquirá", "Girardot", "Chía", "Facatativá",
-    "Fusagasugá", "Mosquera", "Madrid", "Funza", "Tocancipá"
-  ],
-  "Guainía": ["Inírida", "Barrancominas"],
-  "Guaviare": ["San José del Guaviare", "Calamar", "El Retorno"],
-  "Huila": ["Neiva", "Pitalito", "Garzón", "La Plata", "Campoalegre", "Algeciras"],
-  "La Guajira": ["Riohacha", "Maicao", "Uribia", "Fonseca", "San Juan del Cesar", "Villanueva", "Manaure"],
-  "Magdalena": ["Santa Marta", "Ciénaga", "Fundación", "Aracataca", "El Banco", "Plato", "Pivijay"],
-  "Meta": ["Villavicencio", "Acacías", "Granada", "Puerto López", "Restrepo", "Cumaral", "San Martín"],
-  "Nariño": ["Pasto", "Tumaco", "Ipiales", "Túquerres", "La Unión", "Sandoná", "Barbacoas"],
-  "Norte de Santander": ["Cúcuta", "Ocaña", "Pamplona", "Los Patios", "Villa del Rosario", "Chinácota"],
-  "Putumayo": ["Mocoa", "Orito", "Puerto Asís", "Sibundoy", "Villagarzón"],
-  "Quindío": ["Armenia", "Calarcá", "La Tebaida", "Montenegro", "Quimbaya", "Circasia", "Filandia"],
-  "Risaralda": ["Pereira", "Dosquebradas", "Santa Rosa de Cabal", "La Virginia", "Marsella"],
-  "San Andrés y Providencia": ["San Andrés", "Providencia"],
-  "Santander": [
-    "Bucaramanga", "Floridablanca", "Barrancabermeja", "Girón", "Piedecuesta",
-    "San Gil", "Socorro", "Lebrija"
-  ],
-  "Sucre": ["Sincelejo", "Corozal", "Sampués", "San Marcos", "Tolú", "Coveñas", "Los Palmitos"],
-  "Tolima": ["Ibagué", "Espinal", "Honda", "Melgar", "Líbano", "Mariquita", "Chaparral"],
-  "Valle del Cauca": [
-    "Cali", "Palmira", "Buenaventura", "Tuluá", "Cartago", "Jamundí",
-    "Buga", "Yumbo", "Sevilla", "Zarzal", "Caicedonia", "La Unión"
-  ],
-  "Vaupés": ["Mitú", "Carurú", "Taraira"],
-  "Vichada": ["Puerto Carreño", "La Primavera", "Santa Rosalía", "Cumaribo"]
+  "Amazonas": ["Leticia", "Puerto Nariño"],
+  "Antioquia": ["Medellín", "Bello", "Envigado", "Itagüí", "Rionegro", "Turbo"],
+  "Atlántico": ["Barranquilla", "Soledad", "Malambo", "Sabanalarga"],
+  "Bolívar": ["Cartagena", "Magangué", "Turbaco", "El Carmen de Bolívar"],
+  "Boyacá": ["Tunja", "Duitama", "Sogamoso", "Chiquinquirá"],
+  "Caldas": ["Manizales", "La Dorada", "Villamaría"],
+  "Cauca": ["Popayán", "Santander de Quilichao", "Puerto Tejada"],
+  "Cesar": ["Valledupar", "Aguachica", "La Jagua de Ibirico"],
+  "Córdoba": ["Montería", "Lorica", "Planeta Rica"],
+  "Cundinamarca": ["Bogotá", "Soacha", "Zipaquirá", "Girardot", "Chía"],
+  "Huila": ["Neiva", "Pitalito", "Garzón"],
+  "La Guajira": ["Riohacha", "Maicao", "Uribia"],
+  "Magdalena": ["Santa Marta", "Ciénaga", "Fundación"],
+  "Meta": ["Villavicencio", "Acacías", "Granada"],
+  "Nariño": ["Pasto", "Tumaco", "Ipiales"],
+  "Norte de Santander": ["Cúcuta", "Ocaña", "Pamplona"],
+  "Quindío": ["Armenia", "Calarcá", "La Tebaida"],
+  "Risaralda": ["Pereira", "Dosquebradas", "Santa Rosa de Cabal"],
+  "Santander": ["Bucaramanga", "Floridablanca", "Barrancabermeja"],
+  "Sucre": ["Sincelejo", "Corozal", "Sampués"],
+  "Tolima": ["Ibagué", "Espinal", "Honda"],
+  "Valle del Cauca": ["Cali", "Palmira", "Buenaventura", "Tuluá", "Cartago", "Jamundí"],
 };
 
 export default function CheckoutForm({
   formData,
+  formErrors,
   handleChange,
   handleSubmit,
 }: CheckoutFormProps) {
   const departamentos = Object.keys(colombiaData);
-  const ciudades = formData.department
-    ? colombiaData[formData.department] || []
-    : [];
+  const ciudades = formData.department ? colombiaData[formData.department] || [] : [];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Nombre y Apellido */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium">Nombre *</label>
-          <input
-            type="text"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            className="w-full border rounded-md p-2"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Apellidos *</label>
-          <input
-            type="text"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            className="w-full border rounded-md p-2"
-            required
-          />
-        </div>
-      </div>
-
-      {/* Cédula */}
-      <div>
-        <label className="block text-sm font-medium">Cédula (opcional)</label>
-        <input
-          type="text"
-          name="idNumber"
-          value={formData.idNumber}
+        <Field
+          label="Nombre *"
+          name="firstName"
+          value={formData.firstName}
+          error={formErrors.firstName}
           onChange={handleChange}
-          className="w-full border rounded-md p-2"
+        />
+        <Field
+          label="Apellidos *"
+          name="lastName"
+          value={formData.lastName}
+          error={formErrors.lastName}
+          onChange={handleChange}
         />
       </div>
 
-      {/* País */}
+      {/* Cédula (opcional) */}
+      <Field
+        label="Cédula (opcional)"
+        name="idNumber"
+        value={formData.idNumber}
+        onChange={handleChange}
+      />
+
+      {/* País (solo lectura) */}
       <div>
-        <label className="block text-sm font-medium">País / Región</label>
+        <label className="block text-sm font-medium mb-1">País / Región</label>
         <input
           type="text"
           name="country"
@@ -129,133 +85,143 @@ export default function CheckoutForm({
         />
       </div>
 
-      {/* Dirección */}
-      <div>
-        <label className="block text-sm font-medium">Dirección *</label>
-        <input
-          type="text"
-          name="address"
-          value={formData.address}
-          onChange={handleChange}
-          className="w-full border rounded-md p-2"
-          required
-        />
-      </div>
+      {/* Dirección y Apartamento (opcional) */}
+      <Field
+        label="Dirección *"
+        name="address"
+        value={formData.address}
+        error={formErrors.address}
+        onChange={handleChange}
+      />
+      <Field
+        label="Apartamento / habitación (opcional)"
+        name="apartment"
+        value={formData.apartment}
+        onChange={handleChange}
+      />
 
-      {/* Apartamento */}
+      {/* Departamento y Ciudad (anidados) */}
       <div>
-        <label className="block text-sm font-medium">Apartamento / habitación</label>
-        <input
-          type="text"
-          name="apartment"
-          value={formData.apartment}
-          onChange={handleChange}
-          className="w-full border rounded-md p-2"
-        />
-      </div>
-
-      {/* Departamento */}
-      <div>
-        <label className="block text-sm font-medium">Departamento *</label>
+        <label className="block text-sm font-medium mb-1">Departamento *</label>
         <select
           name="department"
           value={formData.department}
           onChange={handleChange}
-          className="w-full border rounded-md p-2"
-          required
+          className={`w-full border rounded-md p-2 ${
+            formErrors.department ? "border-red-500" : "border-gray-300"
+          }`}
+          aria-invalid={!!formErrors.department}
         >
           <option value="">Seleccione un departamento</option>
           {departamentos.map((d) => (
-            <option key={d} value={d}>
-              {d}
-            </option>
+            <option key={d} value={d}>{d}</option>
           ))}
         </select>
+        {formErrors.department && (
+          <p className="text-sm text-red-600 mt-1">{formErrors.department}</p>
+        )}
       </div>
 
-      {/* Ciudad */}
       <div>
-        <label className="block text-sm font-medium">Ciudad *</label>
+        <label className="block text-sm font-medium mb-1">Ciudad *</label>
         <select
           name="city"
           value={formData.city}
           onChange={handleChange}
-          className="w-full border rounded-md p-2"
-          required
           disabled={!formData.department}
+          className={`w-full border rounded-md p-2 ${
+            formErrors.city ? "border-red-500" : "border-gray-300"
+          }`}
+          aria-invalid={!!formErrors.city}
         >
           <option value="">
-            {formData.department
-              ? "Seleccione una ciudad"
-              : "Primero seleccione un departamento"}
+            {formData.department ? "Seleccione una ciudad" : "Primero seleccione un departamento"}
           </option>
           {ciudades.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
+            <option key={c} value={c}>{c}</option>
           ))}
         </select>
+        {formErrors.city && (
+          <p className="text-sm text-red-600 mt-1">{formErrors.city}</p>
+        )}
       </div>
 
-      {/* Código postal */}
-      <div>
-        <label className="block text-sm font-medium">Código postal (opcional)</label>
-        <input
-          type="text"
-          name="postalCode"
-          value={formData.postalCode}
-          onChange={handleChange}
-          className="w-full border rounded-md p-2"
-        />
-      </div>
+      {/* Código postal (opcional) */}
+      <Field
+        label="Código postal (opcional)"
+        name="postalCode"
+        value={formData.postalCode}
+        onChange={handleChange}
+      />
 
-      {/* Teléfono */}
-      <div>
-        <label className="block text-sm font-medium">Teléfono *</label>
-        <input
-          type="tel"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-          className="w-full border rounded-md p-2"
-          required
-        />
-      </div>
+      {/* Teléfono y Correo */}
+      <Field
+        label="Teléfono *"
+        name="phone"
+        value={formData.phone}
+        error={formErrors.phone}
+        onChange={handleChange}
+      />
+      <Field
+        label="Correo electrónico *"
+        name="email"
+        value={formData.email}
+        error={formErrors.email}
+        onChange={handleChange}
+      />
 
-      {/* Correo */}
-      <div>
-        <label className="block text-sm font-medium">Correo electrónico *</label>
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          className="w-full border rounded-md p-2"
-          required
-        />
-      </div>
-
-      {/* Suscripción */}
+      {/* Suscripción (opcional) */}
       <div className="flex items-center gap-2">
         <input
           type="checkbox"
           name="subscribe"
           checked={formData.subscribe}
           onChange={handleChange}
+          aria-label="Suscribirse al boletín (opcional)"
         />
-        <label>Suscribirse a nuestro boletín</label>
+        <label>Suscribirse a nuestro boletín (opcional)</label>
       </div>
 
-      {/* Notas */}
+      {/* Notas (opcional) */}
       <div>
-        <label className="block text-sm font-medium">Notas del pedido (opcional)</label>
+        <label className="block text-sm font-medium mb-1">Notas del pedido (opcional)</label>
         <textarea
           name="notes"
           value={formData.notes}
           onChange={handleChange}
           className="w-full border rounded-md p-2 h-24"
+          placeholder="Instrucciones de entrega, referencias, etc."
         />
       </div>
     </form>
+  );
+}
+
+interface FieldProps {
+  label: string;
+  name: keyof BillingFormData | string;
+  value: string;
+  error?: string;
+  onChange: (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => void;
+}
+
+function Field({ label, name, value, error, onChange }: FieldProps) {
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-1">{label}</label>
+      <input
+        type="text"
+        name={name}
+        value={value}
+        onChange={onChange}
+        className={`w-full border rounded-md p-2 ${
+          error ? "border-red-500" : "border-gray-300"
+        }`}
+        aria-invalid={!!error}
+      />
+      {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
+    </div>
   );
 }
