@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     const x_currency_code = data.get("x_currency_code") as string;
     const x_signature = data.get("x_signature") as string;
     const x_response = data.get("x_response") as string;
-    const x_invoice = data.get("x_invoice") as string;
+    const x_id_invoice = data.get("x_id_invoice") as string;
 
     // Validar la firma
     const signature = crypto
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     // Procesar resultado
     if (x_response === "Aceptada") {
-        console.log("✅ Pago aprobado:", x_invoice);
+        console.log("✅ Pago aprobado:", x_id_invoice);
     } else {
         console.log("⚠️ Pago rechazado:", x_response);
     }

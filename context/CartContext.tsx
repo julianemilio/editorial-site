@@ -2,81 +2,98 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
-export type Libro = {
-  id: number;
-  titulo: string;
-  autor?: string;
-  precio: number;
-  portada?: string;
-  cantidad?: number;
-};
+export interface CartItem {
+  id: string;
+  title: string;
+  price: number;
+  quantity: number;
+  image?: string;
+}
 
-type CartContextType = {
-  cart: Libro[];
-  addToCart: (libro: Libro) => void;
-  updateQuantity: (id: number, cantidad: number) => void;
-  removeFromCart: (id: number) => void;
+interface CartContextType {
+  cartItems: CartItem[];
   totalItems: number;
-};
+  totalAmount: number;
+  addItem: (item: CartItem) => void;
+  removeItem: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
+  clearCart: () => void;
+}
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [cart, setCart] = useState<Libro[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  // Cargar desde localStorage
+  // 🧮 Cálculos automáticos
+  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const totalAmount = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+  // 💾 Persistencia local
   useEffect(() => {
-    const saved = localStorage.getItem("cart");
-    if (saved) setCart(JSON.parse(saved));
+    const storedCart = localStorage.getItem("coneja_cart");
+    if (storedCart) {
+      setCartItems(JSON.parse(storedCart));
+    }
   }, []);
 
-  // Guardar cada cambio
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
+    localStorage.setItem("coneja_cart", JSON.stringify(cartItems));
+  }, [cartItems]);
 
-  // Agregar libro o aumentar cantidad
-  function addToCart(libro: Libro) {
-    setCart((prev) => {
-      const existing = prev.find((l) => l.id === libro.id);
+  // ➕ Agregar producto
+  const addItem = (item: CartItem) => {
+    setCartItems((prev) => {
+      const existing = prev.find((p) => p.id === item.id);
       if (existing) {
-        return prev.map((l) =>
-          l.id === libro.id ? { ...l, cantidad: (l.cantidad ?? 1) + 1 } : l
+        return prev.map((p) =>
+          p.id === item.id ? { ...p, quantity: p.quantity + item.quantity } : p
         );
       }
-      return [...prev, { ...libro, cantidad: 1 }];
+      return [...prev, item];
     });
-  }
+  };
 
-  // Actualizar cantidad manual o por botones
-  function updateQuantity(id: number, cantidad: number) {
-    if (cantidad <= 0) {
-      setCart((prev) => prev.filter((l) => l.id !== id));
-      return;
-    }
-    setCart((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, cantidad } : l))
+  // ❌ Eliminar producto
+  const removeItem = (id: string) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  // ✏️ Actualizar cantidad
+  const updateQuantity = (id: string, quantity: number) => {
+    setCartItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, quantity } : item))
     );
-  }
+  };
 
-  // Eliminar libro del carrito
-  function removeFromCart(id: number) {
-    setCart((prev) => prev.filter((l) => l.id !== id));
-  }
-
-  const totalItems = cart.reduce((sum, l) => sum + (l.cantidad ?? 1), 0);
+  // 🗑 Vaciar carrito
+  const clearCart = () => {
+    setCartItems([]);
+    localStorage.removeItem("coneja_cart");
+  };
 
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, updateQuantity, removeFromCart, totalItems }}
+      value={{
+        cartItems,
+        totalItems,
+        totalAmount,
+        addItem,
+        removeItem,
+        updateQuantity,
+        clearCart,
+      }}
     >
       {children}
     </CartContext.Provider>
   );
 }
 
-export function useCart() {
-  const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCart debe usarse dentro de CartProvider");
-  return ctx;
+// ⚡ Hook de acceso
+export function useCart(): CartContextType {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error("useCart debe usarse dentro de un CartProvider");
+  }
+  return context;
 }
