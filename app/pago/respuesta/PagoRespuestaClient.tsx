@@ -158,7 +158,7 @@ export default function PagoRespuestaClient() {
         <div className="mt-10 flex justify-center gap-6">
           <Link
             href="/"
-            className="bg-[#171717] text-white px-6 py-2 rounded-full hover:bg-[#0B0B0C] transition"
+            className="bg-[#171717] text-white! px-6 py-2 rounded-full hover:bg-[#0B0B0C] transition"
           >
             Volver al inicio
           </Link>
