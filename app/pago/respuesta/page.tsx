@@ -1,11 +1,12 @@
 "use client";
-export const dynamic = "force-dynamic";
+
+export const dynamic = "force-dynamic"; // 👈 evita prerender en build
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { useCart } from "@/context/CartContext"; // 🛒 Importar contexto para limpiar carrito
+import { useCart } from "@/context/CartContext";
 
 interface EpaycoResponse {
   success: boolean;
@@ -21,20 +22,23 @@ interface EpaycoResponse {
 export default function PagoRespuesta() {
   const params = useSearchParams();
   const refPayco = params.get("ref_payco");
-  const { clearCart } = useCart(); // 🧹 función para vaciar el carrito
+  const { clearCart } = useCart();
 
   const [loading, setLoading] = useState(true);
   const [estado, setEstado] = useState<string | null>(null);
   const [monto, setMonto] = useState<string>("");
   const [moneda, setMoneda] = useState<string>("COP");
-  const [cartCleared, setCartCleared] = useState(false); // Evita limpiar dos veces
+  const [cartCleared, setCartCleared] = useState(false);
+  const [emailsSent, setEmailsSent] = useState(false);
 
   useEffect(() => {
     const fetchPago = async () => {
       if (!refPayco) return;
 
       try {
-        const response = await fetch(`https://secure.epayco.co/validation/v1/reference/${refPayco}`);
+        const response = await fetch(
+          `https://secure.epayco.co/validation/v1/reference/${refPayco}`
+        );
         const data: EpaycoResponse = await response.json();
 
         if (data.success && data.data) {
@@ -55,7 +59,7 @@ export default function PagoRespuesta() {
     fetchPago();
   }, [refPayco]);
 
-  // 🧹 Limpiar carrito si el pago fue aceptado
+  // 🧹 limpiar carrito
   useEffect(() => {
     if (estado?.toLowerCase() === "aceptada" && !cartCleared) {
       clearCart();
@@ -63,6 +67,28 @@ export default function PagoRespuesta() {
       console.log("🧹 Carrito limpiado tras pago exitoso");
     }
   }, [estado, clearCart, cartCleared]);
+
+  // 📧 enviar correos
+  useEffect(() => {
+    const sendEmails = async () => {
+      if (!refPayco || emailsSent) return;
+      if (estado?.toLowerCase() !== "aceptada") return;
+
+      try {
+        const res = await fetch("/api/notifications/payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refPayco }),
+        });
+        if (!res.ok) throw new Error("Falló envío de correos");
+        setEmailsSent(true);
+        console.log("📧 Correos enviados (cliente + admin)");
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    sendEmails();
+  }, [estado, refPayco, emailsSent]);
 
   const baseClasses = "bg-white text-[#171717] min-h-screen";
 
@@ -117,12 +143,10 @@ export default function PagoRespuesta() {
 
         {esRechazado && (
           <>
-            <h1 className="text-3xl font-bold text-red-600 mb-4">
-              Pago rechazado
-            </h1>
+            <h1 className="text-3xl font-bold text-red-600 mb-4">Pago rechazado</h1>
             <p className="text-lg mb-2">Tu pago no pudo ser procesado.</p>
             <p className="text-gray-600 mb-6">
-              Si el monto fue descontado, será revertido por tu banco en los próximos días.  
+              Si el monto fue descontado, será revertido por tu banco.  
               Puedes intentar nuevamente o usar otro medio de pago.
             </p>
           </>
@@ -137,7 +161,7 @@ export default function PagoRespuesta() {
               Estamos esperando la confirmación de tu banco o método de pago.
             </p>
             <p className="text-gray-600 mb-6">
-              Cuando se confirme el pago, recibirás un correo electrónico con la información de tu pedido y envío.
+              Cuando se confirme el pago, recibirás un correo con la información de tu pedido y envío.
             </p>
           </>
         )}
@@ -149,7 +173,7 @@ export default function PagoRespuesta() {
             </h1>
             <p className="text-lg text-gray-600 mb-6">
               No pudimos obtener la información del pago.  
-              Si realizaste la transacción, escríbenos para ayudarte a verificarla.
+              Si realizaste la transacción, escríbenos para verificarla.
             </p>
           </>
         )}
