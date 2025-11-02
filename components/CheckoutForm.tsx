@@ -1,4 +1,5 @@
-import { BillingFormData } from "@/app/finalizar-compra/page";
+
+import { BillingFormData } from "@/types/order";
 import { ChangeEvent, FormEvent } from "react";
 
 interface CheckoutFormProps {

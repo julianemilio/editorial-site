@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 
 export default function CartPage() {
-  const { cartItems, updateQuantity, removeItem, totalAmount } = useCart();
+  const { cartItems, updateQuantity, removeFromCart, totalAmount } = useCart();
 
   return (
     <div className="w-full bg-white text-[#171717] min-h-screen">
@@ -84,7 +84,7 @@ export default function CartPage() {
 
                     {/* Eliminar */}
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeFromCart(item.id)}
                       className="text-red-600 hover:text-red-800"
                       title="Eliminar producto"
                     >
