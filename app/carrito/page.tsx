@@ -17,7 +17,7 @@ export default function CartPage() {
             <p className="text-gray-500 text-lg mb-4">Tu carrito está vacío.</p>
             <Link
               href="/libros"
-              className="inline-block bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition"
+              className="inline-block bg-black text-white! px-6 py-3 rounded-md hover:bg-gray-800 transition"
             >
               Ver libros
             </Link>
