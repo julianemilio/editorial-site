@@ -4,22 +4,7 @@ import { useCart } from "@/context/CartContext";
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import CheckoutForm from "@/components/CheckoutForm";
 import OrderSummary from "@/components/OrderSummary";
-
-export interface BillingFormData {
-  firstName: string;
-  lastName: string;
-  idNumber: string;
-  country: string;
-  address: string;
-  apartment: string;
-  city: string;
-  department: string;
-  postalCode: string;
-  phone: string;
-  email: string;
-  notes: string;
-  subscribe: boolean;
-}
+import { BillingFormData } from "@/types/order";
 
 export default function CheckoutPage() {
   const { cartItems, totalAmount } = useCart();
@@ -41,16 +26,13 @@ export default function CheckoutPage() {
   });
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-  const [isFormValid, setIsFormValid] = useState(false);
+  const [isFormValid, setIsFormValid] = useState<boolean>(false);
 
-  // 🧮 Cálculo del envío
   const shippingCost =
     formData.city.toLowerCase() === "cali" ? 8000 : formData.city ? 16000 : 0;
 
-  // 📋 Validación
-  const validateForm = () => {
+  const validateForm = (): Record<string, string> => {
     const errors: Record<string, string> = {};
-
     if (!formData.firstName.trim()) errors.firstName = "El nombre es obligatorio.";
     if (!formData.lastName.trim()) errors.lastName = "El apellido es obligatorio.";
     if (!formData.address.trim()) errors.address = "La dirección es obligatoria.";
@@ -62,11 +44,9 @@ export default function CheckoutPage() {
       !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email)
     )
       errors.email = "Ingrese un correo electrónico válido.";
-
     return errors;
   };
 
-  // ✅ Valida automáticamente cuando el usuario escribe
   useEffect(() => {
     const errors = validateForm();
     setFormErrors(errors);
@@ -76,10 +56,11 @@ export default function CheckoutPage() {
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value, type, checked } = e.target as HTMLInputElement;
+    const { name, value, type } = e.target;
+    const input = e.target as HTMLInputElement;
     setFormData({
       ...formData,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? input.checked : value,
     });
   };
 
@@ -91,7 +72,7 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="w-full bg-white text-[#171717]">
+    <main className="w-full bg-white text-[#171717]">
       <div className="mx-auto max-w-6xl p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* 🧾 Formulario */}
         <section>
@@ -104,7 +85,7 @@ export default function CheckoutPage() {
           />
         </section>
 
-        {/* 💳 Resumen del pedido */}
+        {/* 💳 Resumen */}
         <aside>
           <OrderSummary
             items={cartItems}
@@ -114,9 +95,10 @@ export default function CheckoutPage() {
             buyerName={`${formData.firstName} ${formData.lastName}`}
             buyerEmail={formData.email}
             buyerPhone={formData.phone}
+            billingData={formData}
           />
         </aside>
       </div>
-    </div>
+    </main>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
-import { CartItem } from "@/context/CartContext";
+import { CartItem, OrderPayload, BillingFormData } from "@/types/order";
+import { formatCOP } from "@/lib/format"
 import EpaycoCheckoutButton from "@/components/EpaycoCheckoutButton";
 
 interface OrderSummaryProps {
@@ -10,6 +11,7 @@ interface OrderSummaryProps {
   buyerName: string;
   buyerEmail: string;
   buyerPhone: string;
+  billingData: BillingFormData;
 }
 
 export default function OrderSummary({
@@ -20,9 +22,40 @@ export default function OrderSummary({
   buyerName,
   buyerEmail,
   buyerPhone,
+  billingData,
 }: OrderSummaryProps) {
   const totalWithShipping = total + shipping;
   const invoiceId = `INV-${Date.now()}`;
+
+  const handleBeforePayment = async (): Promise<boolean> => {
+    const payload: OrderPayload = {
+      ...billingData,
+      invoiceId,
+      buyerName,
+      buyerEmail,
+      buyerPhone,
+      items,
+      subtotal: total,
+      shipping,
+      total: totalWithShipping,
+    };
+
+    try {
+      const response = await fetch("/api/orders/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error("Error al guardar el pedido");
+      console.log("🧾 Pedido guardado en Supabase");
+      return true;
+    } catch (err) {
+      console.error("❌ Error:", err);
+      alert("No se pudo guardar el pedido. Intenta nuevamente.");
+      return false;
+    }
+  };
 
   return (
     <div className="border rounded-md p-4 bg-gray-50">
@@ -34,22 +67,22 @@ export default function OrderSummary({
             <span>
               {item.title} × {item.quantity}
             </span>
-            <span>$ {(item.price * item.quantity).toLocaleString()}</span>
+            <span>$ {formatCOP(item.price * item.quantity)}</span>
           </div>
         ))}
       </div>
 
       <div className="flex justify-between mt-4 text-sm">
         <span>Subtotal</span>
-        <span>$ {total.toLocaleString()}</span>
+        <span>$ {formatCOP(total)}</span>
       </div>
       <div className="flex justify-between text-sm">
         <span>Envío</span>
-        <span>{shipping ? `$ ${shipping.toLocaleString()}` : "Por calcular"}</span>
+        <span>{shipping ? `$ ${formatCOP(shipping)}` : "Por calcular"}</span>
       </div>
       <div className="flex justify-between font-semibold border-t pt-2 mt-2">
         <span>Total</span>
-        <span>$ {totalWithShipping.toLocaleString()}</span>
+        <span>$ {formatCOP(totalWithShipping)}</span>
       </div>
 
       <div className="mt-6">
@@ -62,6 +95,7 @@ export default function OrderSummary({
             buyerName={buyerName}
             buyerEmail={buyerEmail}
             buyerPhone={buyerPhone}
+            beforePayment={handleBeforePayment}
           />
         ) : (
           <button

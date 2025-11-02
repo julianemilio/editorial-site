@@ -10,6 +10,7 @@ interface Props {
   buyerName: string;
   buyerEmail: string;
   buyerPhone: string;
+  beforePayment?: () => Promise<boolean>;
 }
 
 export default function EpaycoCheckoutButton({
@@ -20,8 +21,13 @@ export default function EpaycoCheckoutButton({
   buyerName,
   buyerEmail,
   buyerPhone,
+  beforePayment,
 }: Props) {
-  const handlePayment = () => {
+  const handlePayment = async () => {
+    // Guardar pedido en Supabase antes de abrir ePayco
+    const ok = beforePayment ? await beforePayment() : true;
+    if (!ok) return;
+
     const handler = window.ePayco.checkout.configure({
       key: CONFIG.epayco.publicKey,
       test: CONFIG.epayco.testMode,
@@ -46,14 +52,13 @@ export default function EpaycoCheckoutButton({
     });
   };
 
-  console.log("");
-
   return (
     <>
       <Script src="https://checkout.epayco.co/checkout.js" strategy="afterInteractive" />
       <button
         onClick={handlePayment}
-        className="mt-4 bg-brand-black text-brand-blue px-6 py-2 rounded-xl hover:opacity-90 font-semibold">
+        className="w-full bg-[#171717] text-white py-3 rounded-md font-semibold hover:bg-[#0B0B0C] transition"
+      >
         PAGAR CON EPAYCO
       </button>
     </>
