@@ -60,7 +60,7 @@ export default function EpaycoCheckoutButton({
         onClick={handlePayment}
         className="w-full bg-[#171717] text-white py-3 rounded-md font-semibold hover:bg-[#0B0B0C] transition"
       >
-        PAGAR CON  EPAYCO
+        PAGAR CON EPAYCO
       </button>
     </>
   );

@@ -9,7 +9,7 @@ const libroDestacado: Book = {
   descripcion:
     "Once relatos cotidianos y oníricos, en los que humanos y animales comparten la fragilidad, el descubrimiento de la muerte, la ingenuidad y la emoción de estar vivos y explorar el planeta.",
   precio: 100000,
-  precioOferta: 80000,
+  precioOferta: 8000,
   imagen: "/portadas/el-cielo-de-los-peces.jpg"
 };
 

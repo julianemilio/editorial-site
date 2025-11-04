@@ -1,4 +1,5 @@
 
+import { colombiaData } from "@/lib/colombiaData";
 import { BillingFormData } from "@/types/order";
 import { ChangeEvent, FormEvent } from "react";
 
@@ -11,31 +12,6 @@ interface CheckoutFormProps {
   handleSubmit: (e: FormEvent<HTMLFormElement>) => void;
 }
 
-// 🌎 Departamentos y ciudades anidadas
-const colombiaData: Record<string, string[]> = {
-  "Amazonas": ["Leticia", "Puerto Nariño"],
-  "Antioquia": ["Medellín", "Bello", "Envigado", "Itagüí", "Rionegro", "Turbo"],
-  "Atlántico": ["Barranquilla", "Soledad", "Malambo", "Sabanalarga"],
-  "Bolívar": ["Cartagena", "Magangué", "Turbaco", "El Carmen de Bolívar"],
-  "Boyacá": ["Tunja", "Duitama", "Sogamoso", "Chiquinquirá"],
-  "Caldas": ["Manizales", "La Dorada", "Villamaría"],
-  "Cauca": ["Popayán", "Santander de Quilichao", "Puerto Tejada"],
-  "Cesar": ["Valledupar", "Aguachica", "La Jagua de Ibirico"],
-  "Córdoba": ["Montería", "Lorica", "Planeta Rica"],
-  "Cundinamarca": ["Bogotá", "Soacha", "Zipaquirá", "Girardot", "Chía"],
-  "Huila": ["Neiva", "Pitalito", "Garzón"],
-  "La Guajira": ["Riohacha", "Maicao", "Uribia"],
-  "Magdalena": ["Santa Marta", "Ciénaga", "Fundación"],
-  "Meta": ["Villavicencio", "Acacías", "Granada"],
-  "Nariño": ["Pasto", "Tumaco", "Ipiales"],
-  "Norte de Santander": ["Cúcuta", "Ocaña", "Pamplona"],
-  "Quindío": ["Armenia", "Calarcá", "La Tebaida"],
-  "Risaralda": ["Pereira", "Dosquebradas", "Santa Rosa de Cabal"],
-  "Santander": ["Bucaramanga", "Floridablanca", "Barrancabermeja"],
-  "Sucre": ["Sincelejo", "Corozal", "Sampués"],
-  "Tolima": ["Ibagué", "Espinal", "Honda"],
-  "Valle del Cauca": ["Cali", "Palmira", "Buenaventura", "Tuluá", "Cartago", "Jamundí"],
-};
 
 export default function CheckoutForm({
   formData,

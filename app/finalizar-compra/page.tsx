@@ -29,7 +29,7 @@ export default function CheckoutPage() {
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
 
   const shippingCost =
-    formData.city.toLowerCase() === "cali" ? 8000 : formData.city ? 16000 : 0;
+    formData.city.toLowerCase() === "cali" ? 1600 : formData.city ? 16000 : 0;
 
   const validateForm = (): Record<string, string> => {
     const errors: Record<string, string> = {};

@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { supabaseServer } from "@/lib/supabaseServer";
 
 /**
  * Recibe:
@@ -17,7 +12,7 @@ const supabase = createClient(
  */
 export async function POST(req: NextRequest) {
     try {
-        const { invoiceId, status, amount, gateway } = await req.json();
+        const { invoiceId, status, gateway } = await req.json();
 
         if (!invoiceId || !status || !gateway) {
             return NextResponse.json(
@@ -26,11 +21,12 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const { error } = await supabase
+        const { error } = await supabaseServer
             .from("orders")
             .update({
                 status: status.toUpperCase(),
                 gateway,
+
             })
             .eq("invoice_id", invoiceId);
 
