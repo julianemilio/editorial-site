@@ -1,7 +1,10 @@
 "use client";
+
+import { useState } from "react";
 import { CartItem, OrderPayload, BillingFormData } from "@/types/order";
-import { formatCOP } from "@/lib/format"
-import EpaycoCheckoutButton from "@/components/EpaycoCheckoutButton";
+import { formatCOP } from "@/lib/format";
+import PaymentButton from "@/components/PaymentButton";
+import { CONFIG } from "@/lib/config";
 
 interface OrderSummaryProps {
   items: CartItem[];
@@ -27,20 +30,26 @@ export default function OrderSummary({
   const totalWithShipping = total + shipping;
   const invoiceId = `INV-${Date.now()}`;
 
-  const handleBeforePayment = async (): Promise<boolean> => {
-    const payload: OrderPayload = {
-      ...billingData,
-      invoiceId,
-      buyerName,
-      buyerEmail,
-      buyerPhone,
-      items,
-      subtotal: total,
-      shipping,
-      total: totalWithShipping,
-    };
+  const [integrity, setIntegrity] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
 
+  const handleBeforePayment = async (): Promise<boolean> => {
     try {
+      setLoading(true);
+
+      const payload: OrderPayload = {
+        ...billingData,
+        invoiceId,
+        buyerName,
+        buyerEmail,
+        buyerPhone,
+        items,
+        subtotal: total,
+        shipping,
+        total: totalWithShipping,
+      };
+
+      // 🧾 Guarda pedido en Supabase
       const response = await fetch("/api/orders/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -48,12 +57,40 @@ export default function OrderSummary({
       });
 
       if (!response.ok) throw new Error("Error al guardar el pedido");
+
       console.log("🧾 Pedido guardado en Supabase");
+
+      // 🧠 Si el proveedor activo es Bold, pide la firma de integridad
+      if (CONFIG.paymentProvider === "bold" && totalWithShipping > 0) {
+        const res = await fetch("/api/bold/sign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: invoiceId,
+            amount: Math.round(totalWithShipping),
+            currency: "COP",
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!data?.ok || !data?.integrity) {
+          console.error("❌ Error generando firma Bold:", data);
+          alert("No se pudo generar la firma para Bold Checkout");
+          return false;
+        }
+
+        setIntegrity(data.integrity);
+        console.log("✅ Firma Bold generada:", data.integrity);
+      }
+
       return true;
     } catch (err) {
       console.error("❌ Error:", err);
       alert("No se pudo guardar el pedido. Intenta nuevamente.");
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,7 +124,7 @@ export default function OrderSummary({
 
       <div className="mt-6">
         {isFormValid ? (
-          <EpaycoCheckoutButton
+          <PaymentButton
             title="Compra Coneja Editorial"
             description="Pago de libros Coneja Editorial"
             amount={totalWithShipping}
@@ -96,6 +133,7 @@ export default function OrderSummary({
             buyerEmail={buyerEmail}
             buyerPhone={buyerPhone}
             beforePayment={handleBeforePayment}
+            integritySignature={integrity}
           />
         ) : (
           <button
@@ -106,6 +144,12 @@ export default function OrderSummary({
           </button>
         )}
       </div>
+
+      {loading && (
+        <p className="text-center text-sm text-gray-500 mt-3 animate-pulse">
+          Guardando pedido...
+        </p>
+      )}
     </div>
   );
 }

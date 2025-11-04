@@ -5,6 +5,12 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 interface EpaycoResponse {
   success: boolean;
@@ -20,33 +26,73 @@ interface EpaycoResponse {
 export default function PagoRespuestaClient() {
   const params = useSearchParams();
   const refPayco = params.get("ref_payco");
+  const boldStatus = params.get("bold-tx-status"); // ✅ actualizado
+  const boldOrderId = params.get("bold-order-id");
+  const reference = params.get("reference");
+
   const { clearCart } = useCart();
 
   const [loading, setLoading] = useState(true);
   const [estado, setEstado] = useState<string | null>(null);
-  const [monto, setMonto] = useState<string>("");
+  const [monto, setMonto] = useState<string>("—");
   const [moneda, setMoneda] = useState<string>("COP");
   const [cartCleared, setCartCleared] = useState(false);
 
+  // 🔍 Validar pago según origen
   useEffect(() => {
     const fetchPago = async () => {
-      if (!refPayco) return;
-
       try {
-        const response = await fetch(
-          `https://secure.epayco.co/validation/v1/reference/${refPayco}`
-        );
-        const data: EpaycoResponse = await response.json();
+        if (refPayco) {
+          // 🟣 ePayco
+          const response = await fetch(
+            `https://secure.epayco.co/validation/v1/reference/${refPayco}`
+          );
+          const data: EpaycoResponse = await response.json();
 
-        if (data.success && data.data) {
-          setEstado(data.data.x_response);
-          setMonto(data.data.x_amount);
-          setMoneda(data.data.x_currency_code);
+          if (data.success && data.data) {
+            setEstado(data.data.x_response);
+            setMonto(data.data.x_amount);
+            setMoneda(data.data.x_currency_code);
+
+            // 🧾 Actualiza orden ePayco en Supabase
+            await supabase
+              .from("orders")
+              .update({
+                status: data.data.x_response.toUpperCase(),
+                paid_amount: Number(data.data.x_amount),
+                gateway: "epayco",
+                updated_at: new Date().toISOString(),
+              })
+              .eq("reference", refPayco);
+          } else {
+            setEstado("Error");
+          }
+        } else if (boldStatus || boldOrderId || reference) {
+          // 🟢 Bold
+          const status = boldStatus?.toUpperCase() || "PENDING";
+          let estadoTexto = "Pendiente";
+          if (status === "APPROVED") estadoTexto = "Aceptada";
+          else if (status === "REJECTED") estadoTexto = "Rechazada";
+
+          setEstado(estadoTexto);
+          setMonto("—");
+
+          // ✅ Actualiza estado en Supabase
+          if (reference) {
+            await supabase
+              .from("orders")
+              .update({
+                status: estadoTexto.toUpperCase(),
+                gateway: "bold",
+                updated_at: new Date().toISOString(),
+              })
+              .eq("reference", reference);
+          }
         } else {
           setEstado("Error");
         }
       } catch (error) {
-        console.error("Error consultando ePayco:", error);
+        console.error("Error validando pago:", error);
         setEstado("Error");
       } finally {
         setLoading(false);
@@ -54,14 +100,13 @@ export default function PagoRespuestaClient() {
     };
 
     fetchPago();
-  }, [refPayco]);
+  }, [refPayco, boldStatus, boldOrderId, reference]);
 
-  // 🧹 Limpiar carrito si el pago fue aceptado
+  // 🧹 Limpiar carrito si el pago fue aprobado
   useEffect(() => {
     if (estado?.toLowerCase() === "aceptada" && !cartCleared) {
       clearCart();
       setCartCleared(true);
-      console.log("🧹 Carrito limpiado tras pago exitoso");
     }
   }, [estado, clearCart, cartCleared]);
 
@@ -99,19 +144,11 @@ export default function PagoRespuestaClient() {
             <h1 className="text-3xl font-bold text-green-600 mb-4">
               ¡Pago aprobado!
             </h1>
-            <p className="text-lg mb-2">Tu transacción fue procesada exitosamente.</p>
-            <p className="text-gray-700 mb-4">
-              Monto: <strong>${monto} {moneda}</strong>
+            <p className="text-lg mb-2">
+              Tu transacción fue procesada exitosamente.
             </p>
-            <p className="text-gray-600 leading-relaxed mb-6">
-              Gracias por tu compra. Te enviaremos un correo cuando tu pedido esté listo para envío.  
-              Si tienes alguna duda o necesitas soporte, puedes escribirnos a{" "}
-              <a
-                href="mailto:contacto@conejalibrosilustrados.com"
-                className="underline hover:text-black"
-              >
-                contacto@conejalibrosilustrados.com
-              </a>.
+            <p className="text-gray-700 mb-4">
+              Referencia: <strong>{reference}</strong>
             </p>
           </>
         )}
@@ -122,10 +159,6 @@ export default function PagoRespuestaClient() {
               Pago rechazado
             </h1>
             <p className="text-lg mb-2">Tu pago no pudo ser procesado.</p>
-            <p className="text-gray-600 mb-6">
-              Si el monto fue descontado, será revertido por tu banco en los próximos días.  
-              Puedes intentar nuevamente o usar otro medio de pago.
-            </p>
           </>
         )}
 
@@ -135,10 +168,7 @@ export default function PagoRespuestaClient() {
               Pago pendiente
             </h1>
             <p className="text-lg mb-2">
-              Estamos esperando la confirmación de tu banco o método de pago.
-            </p>
-            <p className="text-gray-600 mb-6">
-              Cuando se confirme el pago, recibirás un correo electrónico con la información de tu pedido y envío.
+              Esperando confirmación de tu banco.
             </p>
           </>
         )}
@@ -149,8 +179,8 @@ export default function PagoRespuestaClient() {
               Estado desconocido
             </h1>
             <p className="text-lg text-gray-600 mb-6">
-              No pudimos obtener la información del pago.  
-              Si realizaste la transacción, escríbenos para ayudarte a verificarla.
+              No pudimos obtener la información del pago. Si realizaste la
+              transacción, escríbenos para ayudarte.
             </p>
           </>
         )}
