@@ -1,7 +1,15 @@
 import { Suspense } from "react";
-import PagoRespuestaClient from "./PagoRespuestaClient";
+import PagoRespuestaEpaycoClient from "./PagoRespuestaEpaycoClient";
+import PagoRespuestaBoldClient from "./PagoRespuestaBoldClient";
 
 export default function Page() {
+  const provider = process.env.NEXT_PUBLIC_PAYMENT_PROVIDER;
+
+  const Component =
+    provider === "bold"
+      ? PagoRespuestaBoldClient
+      : PagoRespuestaEpaycoClient;
+
   return (
     <Suspense
       fallback={
@@ -18,7 +26,7 @@ export default function Page() {
         </main>
       }
     >
-      <PagoRespuestaClient />
+      <Component />
     </Suspense>
   );
 }
