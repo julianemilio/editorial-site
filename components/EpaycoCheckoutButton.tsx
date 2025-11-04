@@ -11,6 +11,7 @@ interface Props {
   buyerEmail: string;
   buyerPhone: string;
   beforePayment?: () => Promise<boolean>;
+  
 }
 
 export default function EpaycoCheckoutButton({

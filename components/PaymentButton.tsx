@@ -12,6 +12,7 @@ interface PaymentButtonProps {
   buyerEmail: string;
   buyerPhone: string;
   beforePayment?: () => Promise<boolean>;
+  integritySignature?: string;
 }
 
 export default function PaymentButton(props: PaymentButtonProps) {
