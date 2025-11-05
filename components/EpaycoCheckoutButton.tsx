@@ -55,7 +55,7 @@ export default function EpaycoCheckoutButton({
         description,
         invoice: ref,
         currency: "COP",
-        amount,
+        amount: amount.toString(),
         tax_base: "0",
         tax: "0",
         country: "CO",
