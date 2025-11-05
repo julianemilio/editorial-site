@@ -46,7 +46,7 @@ export default function EpaycoCheckoutButton({
 
       // @ts-ignore
       const handler = window.ePayco.checkout.configure({
-        key: process.env.NEXT_PUBLIC_EPAYCO_KEY,
+        key: process.env.NEXT_PUBLIC_EPAYCO_PUBLIC_KEY || "",
         test: process.env.NEXT_PUBLIC_EPAYCO_TEST === "true",
       });
 
