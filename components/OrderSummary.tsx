@@ -131,6 +131,7 @@ export default function OrderSummary({
       <div className="mt-6">
         {isFormValid ? (
           <PaymentButton
+            invoiceId="temp"
             title="Compra Coneja Editorial"
             description="Pago de libros Coneja Editorial"
             amount={totalWithShipping}
