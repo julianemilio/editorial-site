@@ -9,7 +9,7 @@ import { useCart } from "@/context/CartContext";
 export default function PagoRespuestaBoldClient() {
   const params = useSearchParams();
   const status = params.get("bold-tx-status");
-  const reference = params.get("reference");
+  const reference = params.get("bold-order-id");
   const { clearCart } = useCart();
   const [estado, setEstado] = useState<"APPROVED" | "REJECTED" | "PENDING">("PENDING");
   const [updated, setUpdated] = useState(false); // 👈 evita bucles de actualización

@@ -1,8 +1,7 @@
 "use client";
-import Script from "next/script";
-import { CONFIG } from "@/lib/config";
+import { useState } from "react";
 
-interface Props {
+interface EpaycoCheckoutButtonProps {
   title: string;
   description: string;
   amount: number;
@@ -10,8 +9,10 @@ interface Props {
   buyerName: string;
   buyerEmail: string;
   buyerPhone: string;
-  beforePayment?: () => Promise<boolean>;
-  
+  beforePayment?: () => Promise<{
+    ok: boolean;
+    invoiceId?: string;
+  }>;
 }
 
 export default function EpaycoCheckoutButton({
@@ -23,45 +24,63 @@ export default function EpaycoCheckoutButton({
   buyerEmail,
   buyerPhone,
   beforePayment,
-}: Props) {
-  const handlePayment = async () => {
-    // Guardar pedido en Supabase antes de abrir ePayco
-    const ok = beforePayment ? await beforePayment() : true;
-    if (!ok) return;
+}: EpaycoCheckoutButtonProps) {
+  const [loading, setLoading] = useState(false);
 
-    const handler = window.ePayco.checkout.configure({
-      key: CONFIG.epayco.publicKey,
-      test: CONFIG.epayco.testMode,
-    });
+  const handleEpaycoPayment = async () => {
+    try {
+      setLoading(true);
 
-    handler.open({
-      name: title,
-      description: description,
-      invoice: invoiceId,
-      currency: "COP",
-      amount: amount.toString(),
-      tax_base: "0",
-      tax: "0",
-      country: "co",
-      lang: "es",
-      external: "false",
-      response: `${CONFIG.domain}/pago/respuesta`,
-      confirmation: `${CONFIG.domain}/api/payment/confirm`,
-      name_billing: buyerName,
-      email_billing: buyerEmail,
-      mobilephone_billing: buyerPhone,
-    });
+      const result = beforePayment
+        ? await beforePayment()
+        : { ok: true, invoiceId };
+
+      if (!result.ok || !result.invoiceId) {
+        console.warn("❌ Error en beforePayment o sin invoiceId");
+        return;
+      }
+
+      const ref = result.invoiceId;
+
+      console.log("🚀 Iniciando ePayco con referencia:", ref);
+
+      // @ts-ignore
+      const handler = window.ePayco.checkout.configure({
+        key: process.env.NEXT_PUBLIC_EPAYCO_KEY,
+        test: process.env.NEXT_PUBLIC_EPAYCO_TEST === "true",
+      });
+
+      handler.open({
+        name: title,
+        description,
+        invoice: ref,
+        currency: "COP",
+        amount,
+        tax_base: "0",
+        tax: "0",
+        country: "CO",
+        lang: "es",
+        external: "false",
+        response: `${process.env.NEXT_PUBLIC_SITE_URL}/pago/respuesta`,
+        confirmation: `${process.env.NEXT_PUBLIC_SITE_URL}/api/payment/confirm`,
+        name_billing: buyerName,
+        email_billing: buyerEmail,
+        mobilephone_billing: buyerPhone,
+      });
+    } catch (err) {
+      console.error("❌ Error iniciando ePayco:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <>
-      <Script src="https://checkout.epayco.co/checkout.js" strategy="afterInteractive" />
-      <button
-        onClick={handlePayment}
-        className="w-full bg-[#171717] text-white py-3 rounded-md font-semibold hover:bg-[#0B0B0C] transition"
-      >
-        PAGAR CON EPAYCO
-      </button>
-    </>
+    <button
+      onClick={handleEpaycoPayment}
+      disabled={loading}
+      className="w-full bg-yellow-500 text-black py-3 rounded-md font-semibold hover:bg-yellow-600 transition disabled:opacity-50"
+    >
+      {loading ? "Procesando..." : "Pagar con ePayco"}
+    </button>
   );
 }

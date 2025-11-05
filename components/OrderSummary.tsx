@@ -28,18 +28,22 @@ export default function OrderSummary({
   billingData,
 }: OrderSummaryProps) {
   const totalWithShipping = total + shipping;
-  const invoiceId = `INV-${Date.now()}`;
-
-  const [integrity, setIntegrity] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(false);
 
-  const handleBeforePayment = async (): Promise<boolean> => {
+  const handleBeforePayment = async (): Promise<{
+    ok: boolean;
+    invoiceId?: string;
+    integrity?: string;
+  }> => {
     try {
       setLoading(true);
 
+      // ✅ Generar invoiceId único para esta transacción
+      const newInvoiceId = `INV-${Date.now()}`;
+
       const payload: OrderPayload = {
         ...billingData,
-        invoiceId,
+        invoiceId: newInvoiceId,
         buyerName,
         buyerEmail,
         buyerPhone,
@@ -49,7 +53,7 @@ export default function OrderSummary({
         total: totalWithShipping,
       };
 
-      // 🧾 Guarda pedido en Supabase
+      // 🧾 Guardar pedido en Supabase
       const response = await fetch("/api/orders/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -58,15 +62,17 @@ export default function OrderSummary({
 
       if (!response.ok) throw new Error("Error al guardar el pedido");
 
-      console.log("🧾 Pedido guardado en Supabase");
+      console.log("🧾 Pedido guardado con:", newInvoiceId);
 
-      // 🧠 Si el proveedor activo es Bold, pide la firma de integridad
+      let integrityValue: string | undefined;
+
+      // 🔐 Generar firma si el proveedor es Bold
       if (CONFIG.paymentProvider === "bold" && totalWithShipping > 0) {
         const res = await fetch("/api/bold/sign", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            orderId: invoiceId,
+            orderId: newInvoiceId,
             amount: Math.round(totalWithShipping),
             currency: "COP",
           }),
@@ -74,21 +80,21 @@ export default function OrderSummary({
 
         const data = await res.json();
 
-        if (!data?.ok || !data?.integrity) {
+        if (data?.ok && data?.integrity) {
+          integrityValue = data.integrity;
+        } else {
           console.error("❌ Error generando firma Bold:", data);
           alert("No se pudo generar la firma para Bold Checkout");
-          return false;
+          return { ok: false };
         }
-
-        setIntegrity(data.integrity);
-        console.log("✅ Firma Bold generada:", data.integrity);
       }
 
-      return true;
+      console.log("✅ Firma Bold generada:", integrityValue);
+      return { ok: true, invoiceId: newInvoiceId, integrity: integrityValue };
     } catch (err) {
-      console.error("❌ Error:", err);
-      alert("No se pudo guardar el pedido. Intenta nuevamente.");
-      return false;
+      console.error("❌ Error en beforePayment:", err);
+      alert("No se pudo preparar el pago.");
+      return { ok: false };
     } finally {
       setLoading(false);
     }
@@ -128,12 +134,10 @@ export default function OrderSummary({
             title="Compra Coneja Editorial"
             description="Pago de libros Coneja Editorial"
             amount={totalWithShipping}
-            invoiceId={invoiceId}
             buyerName={buyerName}
             buyerEmail={buyerEmail}
             buyerPhone={buyerPhone}
             beforePayment={handleBeforePayment}
-            integritySignature={integrity}
           />
         ) : (
           <button

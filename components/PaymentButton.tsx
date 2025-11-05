@@ -11,7 +11,11 @@ interface PaymentButtonProps {
   buyerName: string;
   buyerEmail: string;
   buyerPhone: string;
-  beforePayment?: () => Promise<boolean>;
+  beforePayment?: () => Promise<{
+    ok: boolean;
+    invoiceId?: string;
+    integrity?: string;
+  }>;
   integritySignature?: string;
 }
 
