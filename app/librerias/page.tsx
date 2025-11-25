@@ -26,17 +26,6 @@ export default function LibreriasPage() {
             </p>
           </div>
 
-          {/* Medellín */}
-          <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm hover:shadow-md transition">
-            <h3 className="text-xl font-semibold mb-2">Medellín</h3>
-            <p className="text-[#444] leading-relaxed">
-              Exlibris —{" "}
-              <span className="italic text-[#555]">
-                Calle 53 # 64A-27, Barrio Carlos E. Restrepo.
-              </span>
-            </p>
-          </div>
-
           {/* Cali */}
           <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm hover:shadow-md transition">
             <h3 className="text-xl font-semibold mb-2">Cali</h3>
