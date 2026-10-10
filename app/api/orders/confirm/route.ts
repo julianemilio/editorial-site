@@ -7,7 +7,7 @@ import { supabaseServer } from "@/lib/supabaseServer";
  *   invoiceId: string;
  *   status: "APPROVED" | "REJECTED" | "PENDING";
  *   amount?: number;
- *   gateway: "epayco" | "bold";
+ *   gateway: "bold";
  * }
  */
 export async function POST(req: NextRequest) {

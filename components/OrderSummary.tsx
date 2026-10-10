@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { CartItem, OrderPayload, BillingFormData } from "@/types/order";
 import { formatCOP } from "@/lib/format";
-import PaymentButton from "@/components/PaymentButton";
-import { CONFIG } from "@/lib/config";
+import BoldCheckoutButton from "@/components/BoldCheckoutButton";
 
 interface OrderSummaryProps {
   items: CartItem[];
@@ -66,8 +65,8 @@ export default function OrderSummary({
 
       let integrityValue: string | undefined;
 
-      // 🔐 Generar firma si el proveedor es Bold
-      if (CONFIG.paymentProvider === "bold" && totalWithShipping > 0) {
+      // 🔐 Generar firma de integridad para Bold
+      if (totalWithShipping > 0) {
         const res = await fetch("/api/bold/sign", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -130,7 +129,7 @@ export default function OrderSummary({
 
       <div className="mt-6">
         {isFormValid ? (
-          <PaymentButton
+          <BoldCheckoutButton
             invoiceId="temp"
             title="Compra Coneja Editorial"
             description="Pago de libros Coneja Editorial"
