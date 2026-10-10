@@ -20,10 +20,46 @@ export default function LibreriasPage() {
           {/* Bogotá */}
           <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm hover:shadow-md transition">
             <h3 className="text-xl font-semibold mb-2">Bogotá</h3>
-            <p className="text-[#444] leading-relaxed">
-              Librería Woolf —{" "}
-              <span className="italic text-[#555]">Calle 39B # 21-54.</span>
-            </p>
+            <ul className="space-y-2 text-[#444] leading-relaxed">
+              <li>
+                <a
+                  href="https://www.instagram.com/libreria.woolf/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-black"
+                >
+                  Librería Woolf
+                </a>{" "}
+                —{" "}
+                <span className="italic text-[#555]">Calle 39B # 21-54.</span>
+              </li>
+              <li>
+                <a
+                  href="https://www.instagram.com/manadalibreria/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-black"
+                >
+                  Manada Librería
+                </a>{" "}
+                —{" "}
+                <span className="italic text-[#555]">Calle 120A # 6-46.</span>
+              </li>
+              <li>
+                <a
+                  href="https://www.instagram.com/libreriaelgatoqueleeybebe/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-black"
+                >
+                  El Gato que Lee y Bebe
+                </a>{" "}
+                —{" "}
+                <span className="italic text-[#555]">
+                  Calle 70 # 11-48, Chapinero.
+                </span>
+              </li>
+            </ul>
           </div>
 
           {/* Cali */}
@@ -31,15 +67,45 @@ export default function LibreriasPage() {
             <h3 className="text-xl font-semibold mb-2">Cali</h3>
             <ul className="space-y-2 text-[#444] leading-relaxed">
               <li>
-                Oromo Café Librería y Editorial —{" "}
+                <a
+                  href="https://www.instagram.com/oromocafelibreria/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-black"
+                >
+                  Oromo Café Librería y Editorial
+                </a>{" "}
+                —{" "}
                 <span className="italic text-[#555]">
                   Calle 17 # 85-27 B, Barrio El Ingenio.
                 </span>
               </li>
               <li>
-                La Indómita —{" "}
+                <a
+                  href="https://www.instagram.com/laindomita.cali/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-black"
+                >
+                  La Indómita
+                </a>{" "}
+                —{" "}
                 <span className="italic text-[#555]">
                   Cra. 2 Oeste # 7-121, Barrio Santa Teresita.
+                </span>
+              </li>
+              <li>
+                <a
+                  href="https://www.instagram.com/fcecolombia/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-black"
+                >
+                  Librería La María
+                </a>{" "}
+                —{" "}
+                <span className="italic text-[#555]">
+                  Avenida 4 Oeste # 4-59, Casa Obeso Mejía.
                 </span>
               </li>
             </ul>
@@ -49,8 +115,52 @@ export default function LibreriasPage() {
           <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm hover:shadow-md transition">
             <h3 className="text-xl font-semibold mb-2">Pereira</h3>
             <p className="text-[#444] leading-relaxed">
-              Librería Savia —{" "}
+              <a
+                href="https://www.instagram.com/libreria.savia/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-black"
+              >
+                Librería Savia
+              </a>{" "}
+              —{" "}
               <span className="italic text-[#555]">Calle 15 # 12b-22.</span>
+            </p>
+          </div>
+
+          {/* Salento */}
+          <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm hover:shadow-md transition">
+            <h3 className="text-xl font-semibold mb-2">Salento</h3>
+            <p className="text-[#444] leading-relaxed">
+              <a
+                href="https://www.instagram.com/jerfostreetandnight/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-black"
+              >
+                Jerfo: diseño, moda y arte
+              </a>{" "}
+              —{" "}
+              <span className="italic text-[#555]">Calle 2 # 5-23, Local 2.</span>
+            </p>
+          </div>
+
+          {/* Córdoba, Argentina */}
+          <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm hover:shadow-md transition">
+            <h3 className="text-xl font-semibold mb-2">Córdoba, Argentina</h3>
+            <p className="text-[#444] leading-relaxed">
+              <a
+                href="https://www.instagram.com/rubenlibros/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-black"
+              >
+                Rubén Libros
+              </a>{" "}
+              —{" "}
+              <span className="italic text-[#555]">
+                Deán Funes 163, Pasaje Santa Catalina, Locales 1 y 2, Centro.
+              </span>
             </p>
           </div>
 
