@@ -1,62 +1,70 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 
+type Estado = "APPROVED" | "REJECTED" | "PENDING";
+
+// Bold puede tardar unos segundos en registrar la transacción.
+const MAX_ATTEMPTS = 5;
+const RETRY_DELAY_MS = 4000;
+
 export default function PagoRespuestaBoldClient() {
   const params = useSearchParams();
-  const status = params.get("bold-tx-status");
   const reference = params.get("bold-order-id");
   const { clearCart } = useCart();
-  const [estado, setEstado] = useState<"APPROVED" | "REJECTED" | "PENDING">("PENDING");
-  const [updated, setUpdated] = useState(false); // 👈 evita bucles de actualización
+  const [estado, setEstado] = useState<Estado>("PENDING");
+  // clearCart cambia en cada render; se guarda en un ref para no re-disparar el efecto.
+  const clearCartRef = useRef(clearCart);
+  useEffect(() => {
+    clearCartRef.current = clearCart;
+  });
 
   useEffect(() => {
-    if (!reference || !status || updated) return; // ✅ evita múltiples ejecuciones
+    if (!reference) return;
 
-    const normalized =
-      status.toLowerCase() === "approved"
-        ? "APPROVED"
-        : status.toLowerCase() === "rejected"
-        ? "REJECTED"
-        : "PENDING";
+    let cancelled = false;
 
-    setEstado(normalized);
-
-    const updateOrder = async () => {
+    const confirmOrder = async (attempt: number) => {
       try {
         const res = await fetch("/api/orders/confirm", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            invoiceId: reference,
-            status: normalized,
-            gateway: "bold",
-          }),
+          body: JSON.stringify({ invoiceId: reference, gateway: "bold" }),
         });
 
-        if (!res.ok) {
-          console.error("❌ Error al actualizar Supabase:", await res.text());
-          return;
+        const data = await res.json().catch(() => null);
+        if (cancelled) return;
+
+        if (res.ok && data?.status) {
+          setEstado(data.status);
+
+          if (data.status === "APPROVED") {
+            clearCartRef.current();
+            return;
+          }
+          if (data.status === "REJECTED") return;
+        } else {
+          console.error("❌ Error confirmando la orden:", data);
         }
-
-        console.log("✅ Orden actualizada en Supabase");
-
-        if (normalized === "APPROVED") {
-          clearCart();
-        }
-
-        setUpdated(true); // ✅ asegura que no se repita
       } catch (err) {
         console.error("⚠️ Error enviando confirmación:", err);
       }
+
+      if (!cancelled && attempt < MAX_ATTEMPTS) {
+        setTimeout(() => confirmOrder(attempt + 1), RETRY_DELAY_MS);
+      }
     };
 
-    updateOrder();
-  }, [reference, status, updated, clearCart]);
+    confirmOrder(1);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [reference]);
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center text-center p-8 bg-white text-[#171717]">
@@ -72,6 +80,9 @@ export default function PagoRespuestaBoldClient() {
         <>
           <h1 className="text-3xl text-green-600 font-bold mb-2">¡Pago aprobado!</h1>
           <p>Tu compra fue procesada exitosamente.</p>
+          <p className="mt-2 text-sm text-gray-600">
+            Te enviamos un correo de confirmación con los detalles de tu pedido.
+          </p>
         </>
       )}
 
@@ -87,6 +98,13 @@ export default function PagoRespuestaBoldClient() {
           <h1 className="text-3xl text-yellow-600 font-bold mb-2">Pago pendiente</h1>
           <p>Esperando confirmación de tu banco.</p>
         </>
+      )}
+
+      {reference && (
+        <div className="mt-6 rounded-md bg-gray-100 px-6 py-3">
+          <p className="text-sm text-gray-600">Número de pedido</p>
+          <p className="text-lg font-semibold tracking-wide">{reference}</p>
+        </div>
       )}
 
       <Link
